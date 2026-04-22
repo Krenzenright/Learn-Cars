@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Car IQ Academy</title>
+<style>
+:root{
+  --bg:#0b1020;--panel:#121933;--panel2:#1a2347;--text:#eef2ff;--muted:#b8c1e3;--accent:#7dd3fc;--accent2:#a78bfa;--good:#86efac;--warn:#fcd34d;--bad:#fca5a5;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(180deg,#09101f,#101834 50%,#0c1326);color:var(--text)}
+header{padding:18px 16px 10px;position:sticky;top:0;background:rgba(9,16,31,.95);backdrop-filter:blur(10px);z-index:20;border-bottom:1px solid rgba(255,255,255,.08)}
+.header-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand{font-weight:800;font-size:1.2rem;letter-spacing:.2px}.sub{color:var(--muted);font-size:.9rem;margin-top:4px}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.chip{background:var(--panel);border:1px solid rgba(255,255,255,.08);padding:8px 10px;border-radius:999px;font-size:.85rem}
+nav{display:flex;gap:8px;overflow:auto;padding:12px 0 2px}.tab{white-space:nowrap;border:none;background:var(--panel);color:var(--text);padding:10px 12px;border-radius:12px;font-weight:600}.tab.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#06101c}
+main{padding:14px;max-width:1000px;margin:0 auto}
+.screen{display:none}.screen.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.card h3,.card h2{margin:0 0 8px}.muted{color:var(--muted)}
+button,.btn{border:none;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#06101c;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}
+button.secondary{background:#202b57;color:var(--text);border:1px solid rgba(255,255,255,.08)}
+button.ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.14)}
+button.small{padding:8px 10px;font-size:.85rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.space{justify-content:space-between}.pill{display:inline-block;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.08);font-size:.8rem;color:var(--muted)}
+.hero{padding:18px;border-radius:24px;background:radial-gradient(circle at top right,rgba(125,211,252,.35),transparent 30%),radial-gradient(circle at bottom left,rgba(167,139,250,.28),transparent 24%),linear-gradient(180deg,#11193a,#0f1530)}
+.progress{height:12px;background:#1b244a;border-radius:999px;overflow:hidden}.bar{height:100%;background:linear-gradient(90deg,var(--good),var(--accent));width:0%}
+.flash{min-height:180px;display:flex;flex-direction:column;justify-content:space-between}
+.big{font-size:1.2rem;font-weight:800}.xl{font-size:1.5rem;font-weight:900}
+.options{display:grid;gap:8px;margin-top:12px}.option{padding:12px;border-radius:14px;background:#1a244d;border:1px solid rgba(255,255,255,.08);cursor:pointer}
+.option.correct{outline:2px solid var(--good)}.option.wrong{outline:2px solid var(--bad)}
+input,textarea,select{width:100%;background:#121933;color:var(--text);border:1px solid rgba(255,255,255,.12);padding:11px 12px;border-radius:12px}
+textarea{min-height:110px;resize:vertical}
+.logo{width:68px;height:68px;border-radius:16px;display:grid;place-items:center;background:#0d1430;border:1px solid rgba(255,255,255,.08);font-size:1.8rem;font-weight:900}
+.footer-note{padding:20px 0 40px;color:var(--muted);font-size:.85rem;text-align:center}
+.kid{font-size:1.08rem}.badge{display:inline-block;background:#16314d;color:#cbefff;padding:6px 10px;border-radius:999px;font-size:.8rem;margin:4px 6px 0 0}
+.timeline{border-left:3px solid rgba(255,255,255,.12);padding-left:14px;display:grid;gap:12px}.era{position:relative}.era::before{content:"";position:absolute;left:-21px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}.compare .card{min-height:180px}
+@media (max-width:650px){.compare{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <div>
+      <div class="brand">🚗 Car IQ Academy</div>
+      <div class="sub">Learn cars, design language, badges, daily drills, classics, and kid mode.</div>
+    </div>
+    <button class="secondary small" onclick="resetAll()">Reset</button>
+  </div>
+  <div class="stats">
+    <div class="chip">XP: <span id="xp">0</span></div>
+    <div class="chip">Level: <span id="level">1</span></div>
+    <div class="chip">Streak: <span id="streak">0</span></div>
+    <div class="chip">Badges: <span id="badgeCount">0</span></div>
+  </div>
+  <nav id="tabs"></nav>
+</header>
+<main>
+  <section id="home" class="screen active">
+    <div class="hero card">
+      <div class="pill">All-in-one build</div>
+      <h1 style="margin:10px 0 8px">App-store style learning, but inside one file</h1>
+      <p class="muted">This version includes daily 5-minute training, car brands, body styles, design spotting, classics, muscle cars, logo practice, kid mode, and a value-minded collector section.</p>
+      <div class="row">
+        <button onclick="go('daily')">Start 5-minute training</button>
+        <button class="secondary" onclick="go('quiz')">Take a quiz</button>
+        <button class="ghost" onclick="go('kids')">Open kid mode</button>
+      </div>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <div class="card"><h3>Learn tracks</h3><p class="muted">Beginner, spotter, classics, muscle, truck/SUV, and car culture.</p></div>
+      <div class="card"><h3>Quizzes</h3><p class="muted">Multiple choice, logos, design clues, compare mode, and daily challenge.</p></div>
+      <div class="card"><h3>Garage</h3><p class="muted">Save notes, favorites, and track what you want to study next.</p></div>
+      <div class="card"><h3>Kid mode</h3><p class="muted">Simpler language, visual clues, and shorter rounds for younger learners.</p></div>
+    </div>
+  </section>
+
+  <section id="learn" class="screen"></section>
+  <section id="logos" class="screen"></section>
+  <section id="design" class="screen"></section>
+  <section id="classics" class="screen"></section>
+  <section id="quiz" class="screen"></section>
+  <section id="daily" class="screen"></section>
+  <section id="kids" class="screen"></section>
+  <section id="garage" class="screen"></section>
+  <section id="glossary" class="screen"></section>
+  <div class="footer-note">Progress is saved on this device in your browser.</div>
+</main>
+<script>
+const tabs = [
+  ['home','Home'],['learn','Learn'],['logos','Logos'],['design','Design'],['classics','Classics'],['quiz','Quiz'],['daily','Daily 5'],['kids','Kid Mode'],['garage','My Garage'],['glossary','Glossary']
+];
+const flashcards = [
+  {title:'Sedan', type:'Body Style', clue:'4 doors, separate trunk, everyday commuter shape.', tip:'Think family car or daily driver.'},
+  {title:'Hatchback', type:'Body Style', clue:'Rear cargo door lifts with the glass.', tip:'Compact, practical, sporty in some trims.'},
+  {title:'Coupe', type:'Body Style', clue:'2-door shape, sleeker roofline.', tip:'Often sportier styling.'},
+  {title:'Wagon', type:'Body Style', clue:'Long roof, cargo space, lower than an SUV.', tip:'Station wagon = utility without extra ride height.'},
+  {title:'Crossover', type:'Category', clue:'SUV look on a car-like platform.', tip:'Popular family style today.'},
+  {title:'Pickup', type:'Category', clue:'Separate bed for hauling.', tip:'Half-ton, midsize, heavy-duty are common groupings.'},
+  {title:'Muscle Car', type:'Performance', clue:'Big power, straight-line attitude, bold styling.', tip:'Mustang, Camaro, Challenger are the big modern names.'},
+  {title:'Sports Car', type:'Performance', clue:'Agile handling, lower weight, driver focus.', tip:'Not always huge horsepower; balance matters.'},
+  {title:'Luxury Car', type:'Category', clue:'Comfort, technology, materials, refinement.', tip:'Think Mercedes-Benz, BMW, Lexus, Audi.'},
+  {title:'Off-Roader', type:'Category', clue:'Ground clearance, approach angles, rugged tires.', tip:'Jeep Wrangler and Bronco fit here.'}
+];
+const logos = [
+  {emoji:'🟦', brand:'Ford', fact:'Blue oval brand known for trucks, Mustang, and broad mainstream lineup.'},
+  {emoji:'🟨', brand:'Ferrari', fact:'Prancing horse, exotic performance, racing heritage.'},
+  {emoji:'⭕', brand:'Toyota', fact:'Reliability giant; Corolla, Camry, RAV4, Tacoma.'},
+  {emoji:'⭐', brand:'Subaru', fact:'Star cluster logo, AWD identity, outdoors image.'},
+  {emoji:'🛞', brand:'Mercedes-Benz', fact:'Three-pointed star for land, sea, and air origin story.'},
+  {emoji:'🟥', brand:'Honda', fact:'Everyday durability plus Civic, Accord, CR-V, Type R.'},
+  {emoji:'♦️', brand:'Mitsubishi', fact:'Three-diamond mark.'},
+  {emoji:'♾️', brand:'Infiniti', fact:'Horizon/road-inspired oval design.'}
+];
+const designClues = [
+  {name:'Grille', desc:'Big signature grilles often identify a brand family quickly.', examples:'BMW kidney grilles, Jeep 7-slot, Lexus spindle theme.'},
+  {name:'Headlights', desc:'Sharp LEDs, round lamps, split lamps, and DRL shapes are huge clues.', examples:'Wrangler rounds, Cadillac vertical signatures, some EV light bars.'},
+  {name:'Roofline', desc:'Fastback, boxy, upright, coupe-like SUV, wagon roof: easy first read.', examples:'Fastbacks feel sporty; upright roofs feel roomy.'},
+  {name:'Ride Height', desc:'Low = often car/performance; high = SUV/truck/off-road intent.', examples:'Crossovers sit higher than sedans.'},
+  {name:'Rear End', desc:'Taillight bar, vertical lamps, spare tire, or liftgate shape tells a lot.', examples:'Full-width bars are common on newer designs.'},
+  {name:'Wheel Arches', desc:'Rounded, squared-off, flared, or body-colored arch treatment hints at purpose.', examples:'Squared arches suggest ruggedness on some SUVs.'}
+];
+const classics = [
+  {era:'1950s', title:'Chrome & fins', text:'Postwar optimism brought bright paint, chrome, and dramatic tailfins.'},
+  {era:'1960s', title:'Muscle and pony birth', text:'Affordable performance exploded. Mustang started the pony car wave.'},
+  {era:'1970s', title:'Big bodies, emissions shift', text:'Styling stayed bold early on, then fuel economy and regulations changed performance.'},
+  {era:'1980s', title:'Sharp edges & turbo experimentation', text:'Boxier shapes and new tech showed up everywhere.'},
+  {era:'1990s', title:'Cleaner curves', text:'Rounded aerodynamic forms became mainstream.'},
+  {era:'2000s+', title:'LED identity & crossover rise', text:'Lighting signatures and taller family vehicles took over.'}
+];
+const glossary = [
+  ['Naturally Aspirated','An engine with no turbo or supercharger.'],
+  ['Turbocharged','Uses exhaust-driven boost for more power.'],
+  ['RWD','Rear-wheel drive; common in performance and trucks.'],
+  ['AWD','All-wheel drive; powers all wheels in many conditions.'],
+  ['Horsepower','How much power an engine can make.'],
+  ['Torque','Twisting force; helps with pull and acceleration feel.'],
+  ['Fastback','A roofline that slopes smoothly into the rear.'],
+  ['Liftback','A hatch-style rear opening with sedan-like silhouette.'],
+  ['Body-on-frame','Truck-style construction; tough for hauling and off-road use.'],
+  ['Unibody','Car-like structure; common on crossovers and most modern cars.']
+];
+const quizBank = [
+  {q:'Which body style usually has 4 doors and a separate trunk?', a:'Sedan', opts:['Sedan','Coupe','Hatchback','Pickup'], exp:'Sedans usually have four doors and a distinct trunk.'},
+  {q:'What design clue is BMW especially known for on the front?', a:'Kidney grille', opts:['Kidney grille','7-slot grille','Round headlights','Bedside step'], exp:'BMW is strongly associated with twin kidney grilles.'},
+  {q:'Which one is usually considered a muscle car?', a:'Dodge Challenger', opts:['Dodge Challenger','Honda Fit','Toyota Prius','Subaru Outback'], exp:'The Challenger is one of the well-known modern muscle cars.'},
+  {q:'A hatchback is easiest to identify by what feature?', a:'Rear door lifts with glass', opts:['Rear door lifts with glass','Open truck bed','Two seats only','Front trunk'], exp:'The rear opening is the giveaway.'},
+  {q:'What usually suggests off-road intent?', a:'Higher ride height', opts:['Higher ride height','Lower ground clearance','Tiny cargo area','Hidden door handles'], exp:'Ride height is a major clue.'},
+  {q:'Which era is most associated with huge tailfins and lots of chrome?', a:'1950s', opts:['1950s','1980s','2000s','2010s'], exp:'1950s American styling went big on chrome and fins.'},
+  {q:'Which drivetrain powers the rear wheels?', a:'RWD', opts:['RWD','AWD','FWD only means rear','ABS'], exp:'RWD means rear-wheel drive.'},
+  {q:'Which shape is most likely a wagon?', a:'Long roof with rear cargo area', opts:['Long roof with rear cargo area','Two-door low roof only','Separate bed','Tiny city EV'], exp:'Wagons have extended roofs and cargo behind the cabin.'}
+];
+const comparePairs = [
+  ['Sedan','Crossover','Lower, trunk-based, car feel','Higher seating, hatch area, family utility'],
+  ['Muscle Car','Sports Car','Power and attitude','Agility and balance'],
+  ['Wagon','SUV','Long low roof','Taller body and ride height'],
+  ['Classic','Modern','Mechanical simplicity and styling nostalgia','More tech, LEDs, safety, efficiency']
+];
+
+let state = JSON.parse(localStorage.getItem('carIQState')||'{"xp":0,"streak":0,"notes":"","garage":[],"badges":[],"lastDaily":""}');
+function save(){ localStorage.setItem('carIQState', JSON.stringify(state)); renderHeader(); }
+function level(){ return Math.floor(state.xp/120)+1; }
+function addXP(n, reason=''){ state.xp += n; awardBadges(); save(); }
+function awardBadges(){
+  const wants = [];
+  if(state.xp>=50) wants.push('Starter Driver');
+  if(state.xp>=150) wants.push('Street Spotter');
+  if(state.xp>=300) wants.push('Garage Scholar');
+  if((state.garage||[]).length>=5) wants.push('Collector');
+  wants.forEach(b=>{ if(!state.badges.includes(b)) state.badges.push(b); });
+}
+function renderHeader(){
+  xp.textContent = state.xp; level.textContent = level(); streak.textContent = state.streak; badgeCount.textContent = state.badges.length;
+}
+function go(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.id===id)); }
+function resetAll(){ if(confirm('Reset progress, notes, and badges?')){ localStorage.removeItem('carIQState'); location.reload(); }}
+function addGarage(item){ state.garage = state.garage||[]; if(!state.garage.includes(item)) state.garage.push(item); addXP(8); save(); renderGarage(); }
+function exportNotes(){ const blob = new Blob([state.notes||''],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='car-iq-notes.txt'; a.click(); }
+
+function renderTabs(){ tabsEl=document.getElementById('tabs'); tabsEl.innerHTML = tabs.map(([id,label])=>`<button class="tab ${id==='home'?'active':''}" data-id="${id}" onclick="go('${id}')">${label}</button>`).join(''); }
+function renderLearn(){
+  let idx=0, flipped=false;
+  const el=document.getElementById('learn');
+  const show = ()=>{
+    const c = flashcards[idx];
+    el.innerHTML = `
+      <div class="card flash">
+        <div class="row space"><div><div class="pill">${c.type}</div><h2>${c.title}</h2></div><div class="muted">${idx+1}/${flashcards.length}</div></div>
+        <div>
+          <p class="big">${flipped ? c.tip : c.clue}</p>
+          <p class="muted">${flipped ? 'Why it matters' : 'What to look for'}</p>
+        </div>
+        <div class="row">
+          <button onclick="(${(()=>{flipped=!flipped;show();}).toString()})()">${flipped?'Show front':'Flip card'}</button>
+          <button class="secondary" onclick="(${(()=>{idx=(idx-1+flashcards.length)%flashcards.length;flipped=false;show();}).toString()})()">Prev</button>
+          <button class="secondary" onclick="(${(()=>{idx=(idx+1)%flashcards.length;flipped=false;addXP(4);show();}).toString()})()">Next</button>
+          <button class="ghost" onclick="addGarage('${c.title.replace(/'/g,"\\'")}')">Save to Garage</button>
+        </div>
+      </div>
+      <div class="grid" style="margin-top:12px">${flashcards.map(f=>`<div class="card"><h3>${f.title}</h3><p class="muted">${f.clue}</p></div>`).join('')}</div>`;
+  };
+  show();
+}
+function renderLogos(){
+  let current = Math.floor(Math.random()*logos.length); let solved=false;
+  const el=document.getElementById('logos');
+  function show(){
+    const item = logos[current];
+    const opts = [...new Set([item.brand,...logos.sort(()=>Math.random()-.5).slice(0,3).map(x=>x.brand)])].slice(0,4).sort(()=>Math.random()-.5);
+    el.innerHTML = `<div class="grid"><div class="card"><div class="logo">${item.emoji}</div><h2 style="margin-top:12px">Logo Match</h2><p class="muted">Practice brand identity. These are simple placeholders so you can learn the brand names and associations.</p><div class="options">${opts.map(o=>`<div class="option" onclick="checkLogo('${o.replace(/'/g,"\\'")}')">${o}</div>`).join('')}</div><p id="logoResult" class="muted"></p><div class="row"><button class="secondary" onclick="nextLogo()">Next</button><button class="ghost" onclick="addGarage('${item.brand.replace(/'/g,"\\'")}')">Save brand</button></div></div><div class="card"><h3>Brand facts</h3>${logos.map(l=>`<p><strong>${l.brand}:</strong> <span class="muted">${l.fact}</span></p>`).join('')}</div></div>`;
+    window.checkLogo = function(ans){ if(solved) return; const res=document.getElementById('logoResult'); if(ans===item.brand){ res.textContent=`Correct — ${item.fact}`; addXP(10); solved=true; } else { res.textContent=`Not quite. Correct answer: ${item.brand}. ${item.fact}`; solved=true; }};
+    window.nextLogo = function(){ current = Math.floor(Math.random()*logos.length); solved=false; show(); };
+  }
+  show();
+}
+function renderDesign(){
+  document.getElementById('design').innerHTML = `<div class="grid">${designClues.map(d=>`<div class="card"><h3>${d.name}</h3><p>${d.desc}</p><p class="muted"><strong>Examples:</strong> ${d.examples}</p><button class="ghost small" onclick="addXP(5)">Studied</button></div>`).join('')}</div><div class="card" style="margin-top:12px"><h2>Comparison Lab</h2><div class="compare">${comparePairs.map(p=>`<div class="card"><div class="pill">${p[0]}</div><p class="big">${p[2]}</p></div><div class="card"><div class="pill">${p[1]}</div><p class="big">${p[3]}</p></div>`).join('')}</div></div>`;
+}
+function renderClassics(){
+  document.getElementById('classics').innerHTML = `<div class="card"><h2>Design Timeline</h2><div class="timeline">${classics.map(c=>`<div class="era"><div class="pill">${c.era}</div><h3>${c.title}</h3><p class="muted">${c.text}</p><button class="ghost small" onclick="addGarage('${(c.era+' '+c.title).replace(/'/g,"\\'")}')">Save</button></div>`).join('')}</div></div><div class="grid" style="margin-top:12px"><div class="card"><h3>Muscle Car Basics</h3><p class="muted">Think attitude, bigger power, and bold styling. Classic American identity matters here almost as much as raw numbers.</p></div><div class="card"><h3>Classic Car Spotting</h3><p class="muted">Look for chrome, bumper style, ride height, wheel design, greenhouse shape, and whether the body lines are boxy or flowing.</p></div><div class="card"><h3>Collector Mindset</h3><p class="muted">Rarity, condition, originality, documentation, and desirability all affect value. Special trims and options can matter a lot.</p></div></div>`;
+}
+function renderQuiz(){
+  let i=0, score=0, locked=false;
+  const el=document.getElementById('quiz');
+  const set = quizBank.sort(()=>Math.random()-.5).slice(0,5);
+  function show(){
+    const q=set[i]; locked=false;
+    el.innerHTML = `<div class="card"><div class="row space"><h2>Quiz Arena</h2><div class="pill">Question ${i+1} / ${set.length}</div></div><p class="big">${q.q}</p><div class="options">${q.opts.sort(()=>Math.random()-.5).map(o=>`<div class="option" onclick="answerQuiz('${o.replace(/'/g,"\\'")}')">${o}</div>`).join('')}</div><p id="quizMsg" class="muted"></p><div class="row"><button class="secondary" onclick="restartQuiz()">Restart</button></div></div>`;
+    window.answerQuiz = function(ans){ if(locked) return; locked=true; const msg=document.getElementById('quizMsg'); if(ans===q.a){ score++; addXP(15); msg.textContent='Correct. '+q.exp; } else { msg.textContent='Not quite. Correct answer: '+q.a+'. '+q.exp; } setTimeout(()=>{ i++; if(i<set.length) show(); else finish(); }, 800); };
+    window.restartQuiz = renderQuiz;
+  }
+  function finish(){
+    const pct=Math.round(score/set.length*100);
+    el.innerHTML = `<div class="card"><h2>Finished</h2><p class="xl">${score} / ${set.length}</p><div class="progress"><div class="bar" style="width:${pct}%"></div></div><p class="muted" style="margin-top:10px">Nice work. Keep replaying to build recognition speed.</p><div class="row"><button onclick="renderQuiz()">Play again</button><button class="secondary" onclick="go('daily')">Daily 5</button></div></div>`;
+    if(score===set.length) addXP(25);
+  }
+  show();
+}
+function renderDaily(){
+  const today = new Date().toISOString().slice(0,10);
+  const done = state.lastDaily===today;
+  const el=document.getElementById('daily');
+  const tasks = [
+    'Study 3 flashcards',
+    'Name 2 design clues from memory',
+    'Finish 1 quick logo round',
+    'Read 1 timeline era',
+    'Save 1 item to My Garage'
+  ];
+  el.innerHTML = `<div class="card"><h2>Daily 5-Minute Training</h2><p class="muted">A small realistic routine built for busy days.</p>${tasks.map((t,idx)=>`<div class="row space" style="padding:10px 0;border-top:${idx? '1px solid rgba(255,255,255,.08)' : 'none'}"><div>${t}</div><button class="small ${done?'secondary':''}" onclick="completeDaily()">${done?'Done':'Mark done'}</button></div>`).join('')}<p class="muted">Today's status: <strong>${done?'Complete':'Not completed yet'}</strong></p></div>`;
+  window.completeDaily = function(){ if(state.lastDaily!==today){ state.lastDaily=today; state.streak=(state.streak||0)+1; addXP(30); save(); renderDaily(); } };
+}
+function renderKids(){
+  const items = [
+    ['SUV','Tall car for families and stuff.'],['Truck','Has a back bed for carrying things.'],['Race car','Built to go fast on a track.'],['Old car','From a long time ago.'],['Fancy car','Luxury and comfort.']
+  ];
+  document.getElementById('kids').innerHTML = `<div class="card kid"><h2>Kid Mode</h2><p class="muted">Short, simple, fun.</p><div class="grid">${items.map(i=>`<div class="card"><h3>${i[0]}</h3><p>${i[1]}</p><button class="ghost small" onclick="addXP(5)">I learned this</button></div>`).join('')}</div><div class="card" style="margin-top:12px"><h3>Quick game</h3><p>Which one usually sits higher off the ground?</p><div class="options"><div class="option" onclick="kidAnswer(true)">SUV</div><div class="option" onclick="kidAnswer(false)">Sedan</div></div><p id="kidMsg" class="muted"></p></div></div>`;
+  window.kidAnswer = function(ok){ document.getElementById('kidMsg').textContent = ok ? 'Yes — SUVs usually sit higher.' : 'Close, but SUVs usually sit higher.'; if(ok) addXP(10); };
+}
+function renderGarage(){
+  const el=document.getElementById('garage');
+  el.innerHTML = `<div class="grid"><div class="card"><h2>My Garage</h2>${(state.garage||[]).length? state.garage.map(g=>`<div class="badge">${g}</div>`).join('') : '<p class="muted">Nothing saved yet. Use Save buttons in lessons.</p>'}<div style="margin-top:12px"><button class="secondary small" onclick="clearGarage()">Clear Garage</button></div></div><div class="card"><h2>Notes</h2><textarea id="notesBox" placeholder="Write what you noticed about headlights, grilles, eras, or brands...">${state.notes||''}</textarea><div class="row" style="margin-top:10px"><button onclick="saveNotes()">Save notes</button><button class="secondary" onclick="exportNotes()">Export</button></div></div><div class="card"><h2>Badges</h2>${state.badges.length?state.badges.map(b=>`<div class="badge">${b}</div>`).join(''):'<p class="muted">Start learning to unlock badges.</p>'}</div></div>`;
+  window.saveNotes = function(){ state.notes=document.getElementById('notesBox').value; addXP(5); save(); renderGarage(); };
+  window.clearGarage = function(){ state.garage=[]; save(); renderGarage(); };
+}
+function renderGlossary(){
+  document.getElementById('glossary').innerHTML = `<div class="card"><h2>Car Glossary</h2><div class="grid">${glossary.map(([term,def])=>`<div class="card"><h3>${term}</h3><p class="muted">${def}</p></div>`).join('')}</div></div>`;
+}
+function init(){ renderTabs(); renderHeader(); renderLearn(); renderLogos(); renderDesign(); renderClassics(); renderQuiz(); renderDaily(); renderKids(); renderGarage(); renderGlossary(); }
+init();
+</script>
+</body>
+</html>
